@@ -58,7 +58,7 @@
     <p>
         <strong>Which models does this cover?</strong>
         Only OpenAI's, through their two current tokenizers. Every model family splits text its own way, so other
-        models will give different counts. Some tokenizers are not public at all (Claude's, for example); others, like
+        models will give different counts. Some tokenizers are not public at all (Claude's, for example). Others, like
         Llama's, are public but are left out to keep this page small. For exact counts on those models, use the
         provider's own tools: Anthropic's API, for instance, has an endpoint that counts tokens.
     </p>
@@ -79,7 +79,7 @@
     private string secondId = TokenizerCatalog.All[1].Id;
     private string priceText = "";
 
-    // Read as text so a half-typed number such as "2." is not wiped; a comma works as the decimal mark too.
+    // Read as text so a half-typed number such as "2." is not wiped. A comma works as the decimal mark too.
     private decimal? Price =>
         decimal.TryParse(priceText.Replace(',', '.'), NumberStyles.Number, CultureInfo.InvariantCulture, out var value)
         && value >= 0 ? value : null;
