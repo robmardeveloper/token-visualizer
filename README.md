@@ -6,6 +6,8 @@ A web page that shows how language models split text into tokens: the pieces the
 Type or paste some text and see each token in its own color, how many there are and what they would cost. It runs
 entirely in the browser with Blazor WebAssembly. The text is never sent to a server.
 
+**Try it:** https://robmardeveloper.github.io/token-visualizer/
+
 ![The same Spanish paragraph split by two tokenizers: 48 tokens with o200k_base and 56 with cl100k_base](docs/screenshot.png)
 
 ## What it shows
@@ -58,6 +60,8 @@ Three details that took some thought:
 Everything the page needs comes down to the browser on the first visit. Measured on the Release build:
 
 - **4.0 MB** compressed with Brotli, 8.9 MB uncompressed.
+- **4.5 MB** from GitHub Pages, which hosts the live page. Pages compresses with gzip, not Brotli. On later visits
+  the browser can reuse the files from its cache.
 - The two vocabularies are 1.6 MB of that (1.2 MB for `o200k_base`, 0.5 MB for `cl100k_base`).
 - The culture data (ICU) is left out with `InvariantGlobalization`, which saved about 0.8 MB. The page is in English
   and tokenizing does not depend on the culture.
