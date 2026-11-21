@@ -55,10 +55,14 @@
 </div>
 
 <aside class="note">
-    <strong>Why is Claude not here?</strong>
-    Anthropic has not published Claude's tokenizer, so its counts cannot be computed in the browser and can differ
-    noticeably from these; Anthropic's API has an endpoint that counts tokens for a real request.
-    Hover over a token to see its ID. Prices are not built in because they change: type the one you want to check.
+    <p>
+        <strong>Which models does this cover?</strong>
+        Only OpenAI's, through their two current tokenizers. Every model family splits text its own way, so other
+        models will give different counts. Some tokenizers are not public at all (Claude's, for example); others, like
+        Llama's, are public but are left out to keep this page small. For exact counts on those models, use the
+        provider's own tools: Anthropic's API, for instance, has an endpoint that counts tokens.
+    </p>
+    <p>Hover over a token to see its ID. Prices are not built in because they change: type the one you want to check.</p>
 </aside>
 
 <footer>
