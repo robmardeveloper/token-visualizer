@@ -1,6 +1,7 @@
 <Solution>
   <Folder Name="/src/">
     <Project Path="src/TokenVisualizer.Core/TokenVisualizer.Core.csproj" />
+    <Project Path="src/TokenVisualizer.Web/TokenVisualizer.Web.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/TokenVisualizer.Core.Tests/TokenVisualizer.Core.Tests.csproj" />

@@ -1,0 +1,84 @@
+﻿@page "/"
+@using System.Globalization
+@using TokenVisualizer.Core
+
+<PageTitle>Token visualizer</PageTitle>
+
+<h1>Token visualizer</h1>
+<p class="intro">
+    Language models read text as tokens, not letters or words. Type or paste some text to see how it is split,
+    how many tokens it takes and what that would cost. Everything runs in your browser: the text is not sent anywhere.
+</p>
+
+<div class="samples">
+    <span>Try a sample:</span>
+    @foreach (var sample in SampleTexts.All)
+    {
+        <button type="button" @onclick="() => text = sample.Text">@sample.Name</button>
+    }
+</div>
+
+<textarea @bind="text" @bind:event="oninput" rows="8" spellcheck="false" aria-label="Text to tokenize"></textarea>
+
+<div class="options">
+    <label>
+        Tokenizer
+        <select @bind="firstId">
+            @foreach (var info in TokenizerCatalog.All)
+            {
+                <option value="@info.Id">@info.Name</option>
+            }
+        </select>
+    </label>
+    <label>
+        Compare with
+        <select @bind="secondId">
+            <option value="">Nothing</option>
+            @foreach (var info in TokenizerCatalog.All)
+            {
+                <option value="@info.Id">@info.Name</option>
+            }
+        </select>
+    </label>
+    <label>
+        Price per million tokens (optional)
+        <input type="text" inputmode="decimal" placeholder="e.g. 2.50" @bind="priceText" @bind:event="oninput" />
+    </label>
+</div>
+
+<div class="panels">
+    <TokenView Info="Find(firstId)" Text="@text" PricePerMillionTokens="Price" />
+    @if (!string.IsNullOrEmpty(secondId))
+    {
+        <TokenView Info="Find(secondId)" Text="@text" PricePerMillionTokens="Price" />
+    }
+</div>
+
+<aside class="note">
+    <strong>Why is Claude not here?</strong>
+    Anthropic has not published Claude's tokenizer, so its counts cannot be computed in the browser and can differ
+    noticeably from these; Anthropic's API has an endpoint that counts tokens for a real request.
+    Hover over a token to see its ID. Prices are not built in because they change: type the one you want to check.
+</aside>
+
+<footer>
+    Based on the lesson
+    <a href="https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/05-nlp-foundations-to-advanced/19-subword-tokenization">Subword tokenization</a>
+    of the course <a href="https://github.com/rohitg00/ai-engineering-from-scratch">AI Engineering from Scratch</a> (MIT).
+    Tokenizers by <a href="https://www.nuget.org/packages/Microsoft.ML.Tokenizers">Microsoft.ML.Tokenizers</a>.
+    Built with Blazor WebAssembly.
+</footer>
+
+@code {
+    private string text = SampleTexts.All[0].Text;
+    private string firstId = TokenizerCatalog.All[0].Id;
+    private string secondId = TokenizerCatalog.All[1].Id;
+    private string priceText = "";
+
+    // Read as text so a half-typed number such as "2." is not wiped; a comma works as the decimal mark too.
+    private decimal? Price =>
+        decimal.TryParse(priceText.Replace(',', '.'), NumberStyles.Number, CultureInfo.InvariantCulture, out var value)
+        && value >= 0 ? value : null;
+
+    private static TokenizerInfo Find(string id) => TokenizerCatalog.All.First(info => info.Id == id);
+}

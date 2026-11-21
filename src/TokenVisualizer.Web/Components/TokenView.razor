@@ -1,0 +1,70 @@
+@using System.Globalization
+@using TokenVisualizer.Core
+
+<section class="panel">
+    <header>
+        <h2>@Info.Name</h2>
+        <p class="used-by">@Info.UsedBy</p>
+    </header>
+
+    <dl class="stats">
+        <div><dt>Tokens</dt><dd>@Format(analysis.Tokens)</dd></div>
+        <div><dt>Characters</dt><dd>@Format(analysis.Characters)</dd></div>
+        <div><dt>Words</dt><dd>@Format(analysis.Words)</dd></div>
+        <div>
+            <dt>Tokens per word</dt>
+            <dd>@(analysis.TokensPerWord?.ToString("0.00", CultureInfo.InvariantCulture) ?? "–")</dd>
+        </div>
+        @if (PricePerMillionTokens is decimal price)
+        {
+            <div>
+                <dt>Cost</dt>
+                <dd>@CostEstimate.For(analysis.Tokens, price).ToString("0.######", CultureInfo.InvariantCulture)</dd>
+            </div>
+        }
+    </dl>
+
+    <div class="tokens" aria-label="Text split into tokens">
+        @for (var i = 0; i < analysis.Segments.Count; i++)
+        {
+            var segment = analysis.Segments[i];
+            <span class="@ColorClass(segment, i)" title="@Describe(segment)">@segment.Text</span>
+        }
+    </div>
+</section>
+
+@code {
+    [Parameter, EditorRequired]
+    public required TokenizerInfo Info { get; set; }
+
+    [Parameter, EditorRequired]
+    public required string Text { get; set; }
+
+    [Parameter]
+    public decimal? PricePerMillionTokens { get; set; }
+
+    private TextAnalysis analysis = new([], 0, 0, 0);
+    private (string Id, string Text)? analyzed;
+
+    protected override void OnParametersSet()
+    {
+        // Only tokenize again when the text or the tokenizer changed, not when the price did.
+        if (analyzed != (Info.Id, Text))
+        {
+            analysis = TextAnalyzer.Analyze(TokenizerCatalog.Get(Info.Id), Text);
+            analyzed = (Info.Id, Text);
+        }
+    }
+
+    private static string Format(int value) => value.ToString("N0", CultureInfo.InvariantCulture);
+
+    private static string ColorClass(TokenSegment segment, int index) =>
+        segment.TokenIds.Count == 0 ? "token none" : $"token c{index % 6}";
+
+    private static string Describe(TokenSegment segment) => segment.TokenIds.Count switch
+    {
+        0 => "Not part of any token",
+        1 => $"Token ID: {segment.TokenIds[0]}",
+        var count => $"Token IDs: {string.Join(", ", segment.TokenIds)} (this text is split into {count} tokens)",
+    };
+}
